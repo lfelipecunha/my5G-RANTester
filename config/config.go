@@ -43,7 +43,6 @@ type Config struct {
 			Sd  int    `yaml: "sd"`
 			Sst string `yaml: "sst"`
 		} `yaml: "snssai"`
-		Ping string `yaml: "ping"`
 	} `yaml:"ue"`
 	AMF struct {
 		Ip   string `yaml: "ip"`

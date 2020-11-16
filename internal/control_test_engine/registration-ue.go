@@ -1,7 +1,6 @@
 package control_test_engine
 
 import (
-	"fmt"
 	"github.com/ishidawataru/sctp"
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine/context"
@@ -31,7 +30,7 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	}
 
 	// receive NAS Authentication Request Msg
-	ngapMsg, err := nas_transport.DownlinkNasTransport(connN2, ue.Supi)
+	ngapMsg, err := nas_transport.DownlinkNasTransport(connN2)
 	if logging.Check_error(err, "receive DownlinkNasTransport/authentication request") {
 		return ue.Supi, err
 	}
@@ -52,12 +51,12 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	}
 
 	// receive NAS Security Mode Command Msg
-	_, err = nas_transport.DownlinkNasTransport(connN2, ue.Supi)
+	_, err = nas_transport.DownlinkNasTransport(connN2)
 	if logging.Check_error(err, "receive DownlinkNasTransport/Security Mode Command") {
 		return ue.Supi, err
 	}
 
-	// send NAS Security Mode Complete from UplinkNasTransport
+	// send NAS Security Mode Complete within UplinkNasTransport
 	pdu, err = mm_5gs.SecurityModeComplete(ue)
 	if logging.Check_error(err, "Security Mode Complete worked fine!") {
 		return ue.Supi, err
@@ -68,7 +67,7 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	}
 
 	// receive ngap Initial Context Setup Request Msg.
-	_, err = nas_transport.DownlinkNasTransport(connN2, ue.Supi)
+	_, err = nas_transport.DownlinkNasTransport(connN2)
 	if logging.Check_error(err, "receive NGAP/Initial Context Setup Request") {
 		return ue.Supi, err
 	}
@@ -89,15 +88,7 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 		return ue.Supi, err
 	}
 
-	// included configuration update command here.
-	confUpdate, err := nas_transport.DownlinkNasTransport(connN2, ue.Supi)
-	if logging.Check_error(err, "") {
-		return ue.Supi, err
-	}
-	if logging.Check_Ngap(confUpdate, "receive DownlinkNasTransport/ConfigurationUpdateCommand") {
-		fmt.Println("does not receive receive DownlinkNasTransport/ConfigurationUpdateCommand")
-	}
-	//time.Sleep(100 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 
 	// send PduSessionEstablishmentRequest Msg
 	pdu, err = mm_5gs.UlNasTransport(ue, uint8(ue.AmfUeNgapId), nasMessage.ULNASTransportRequestTypeInitialRequest, "internet", &ue.Snssai)
@@ -111,7 +102,7 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	}
 
 	// receive 12. NGAP-PDU Session Resource Setup Request(DL nas transport((NAS msg-PDU session setup Accept)))
-	_, err = nas_transport.DownlinkNasTransport(connN2, ue.Supi)
+	_, err = nas_transport.DownlinkNasTransport(connN2)
 	if logging.Check_error(err, "receive PDU Session Resource Setup Request/Dl Nas Transport/PDU establishment accept") {
 		return ue.Supi, err
 	}

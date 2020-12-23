@@ -175,6 +175,26 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:    "code-decoupling",
+				Aliases: []string{"dec"},
+				Usage:   "Testing code decoupling",
+				Action: func(c *cli.Context) error {
+					name := "Testing code decoupling"
+					cfg := config.Data
+
+					log.Info("---------------------------------------")
+					log.Info("Starting test function: ", name)
+					log.Info("Number of UEs: ", 1)
+					log.Info("gNodeB control interface IP/Port: ", cfg.GNodeB.ControlIF.Ip, "/", cfg.GNodeB.ControlIF.Port)
+					log.Info("gNodeB data interface IP/Port: ", cfg.GNodeB.DataIF.Ip, "/", cfg.GNodeB.DataIF.Port)
+					log.Info("AMF IP/Port: ", cfg.AMF.Ip, "/", cfg.AMF.Port)
+					log.Info("UPF IP/Port: ", cfg.UPF.Ip, "/", cfg.UPF.Port)
+					log.Info("---------------------------------------")
+					runThreads(1, 1)
+					return nil
+				},
+			},
 		},
 	}
 

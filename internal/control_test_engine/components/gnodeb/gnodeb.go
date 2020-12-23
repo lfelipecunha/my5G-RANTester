@@ -7,6 +7,7 @@ import (
 	"my5G-RANTester/internal/control_test_engine/context"
 	"my5G-RANTester/internal/data_test_engine"
 	"my5G-RANTester/lib/nas"
+
 	"net"
 	"os"
 	"os/signal"
@@ -38,6 +39,7 @@ func GNodeB() {
 		log.Fatal("The test failed when GNB tried to attach! Error: ", err)
 	}
 
+	log.Info("Testa")
 	go startServer(upfConn, contextGnb)
 }
 
@@ -52,7 +54,7 @@ func startServer(upfConn *net.UDPConn, ranGnbContext *context.RanGnbContext) {
 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
 	go func(ln net.Listener, c chan os.Signal) {
 		sig := <-c
-		log.Info("Caught signal %s: shutting down.", sig)
+		log.Error("Caught signal %s: shutting down.", sig)
 		ln.Close()
 		os.Exit(0)
 	}(ln, sigc)
@@ -64,6 +66,7 @@ func startServer(upfConn *net.UDPConn, ranGnbContext *context.RanGnbContext) {
 			log.Fatal("Accept error: ", err)
 		}
 
+		log.Info("Server accepted connection from XY")
 		go ueConnection(fd)
 	}
 }
@@ -82,6 +85,7 @@ func ueConnection(c net.Conn) {
 
 		if nasMessage.GmmMessage != nil {
 			log.Info("Message type: ", nasMessage.GmmMessage.GmmHeader.GetMessageType())
+
 		} else {
 			log.Warn("GSM Message received but not implemented yet")
 		}

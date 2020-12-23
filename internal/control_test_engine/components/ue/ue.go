@@ -64,9 +64,17 @@ func connect(ueContext *context.RanUeContext) {
 	var receivedMsgType uint8
 	var channel = make(chan uint8)
 
-	c = dial(sock)
+	log.Info("Connecting...")
+	c, err := net.Dial("unix", sock)
 
-	go reader(c, channel)
+	if err != nil {
+		log.Fatal("Dial error", err)
+	}
+	defer c.Close()
+
+	log.Info("Connected!")
+
+	//go reader(c, channel)
 	for {
 		switch ueStateMachine {
 		case MM5G_DEREGISTERED:
@@ -100,7 +108,13 @@ func connect(ueContext *context.RanUeContext) {
 		log.WithFields(log.Fields{
 			"state": ueStateMachine,
 		}).Info("Sending message")
-		sendMessage(c, msg)
+
+		log.Info("Message size in bytes: ", len(msg))
+		_, err := c.Write(msg)
+		if err != nil {
+			log.Fatal("Write error:", err)
+		}
+		log.Info("Client sent:", msg)
 	}
 }
 

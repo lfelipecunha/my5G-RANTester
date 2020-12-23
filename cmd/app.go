@@ -191,7 +191,7 @@ func main() {
 					log.Info("AMF IP/Port: ", cfg.AMF.Ip, "/", cfg.AMF.Port)
 					log.Info("UPF IP/Port: ", cfg.UPF.Ip, "/", cfg.UPF.Port)
 					log.Info("---------------------------------------")
-					runThreads(1, 1)
+					runThreads(3, 1)
 					return nil
 				},
 			},

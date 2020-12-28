@@ -1,13 +1,16 @@
 package nas_transport
 
 import (
+	ctx "context"
 	"fmt"
-	"github.com/ishidawataru/sctp"
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/internal/control_test_engine/context"
 	"my5G-RANTester/lib/aper"
 	"my5G-RANTester/lib/ngap"
 	"my5G-RANTester/lib/ngap/ngapType"
+	"time"
+
+	"github.com/ishidawataru/sctp"
+	log "github.com/sirupsen/logrus"
 )
 
 func getUplinkNASTransport(amfUeNgapID, ranUeNgapID int64, nasPdu []byte, plmn []byte, tac []byte) ([]byte, error) {
@@ -94,49 +97,51 @@ func buildUplinkNasTransport(amfUeNgapID, ranUeNgapID int64, nasPdu []byte, plmn
 }
 
 func UplinkNasTransport(connN2 *sctp.SCTPConn, amfUeNgapID int64, ranUeNgapID int64, nasPdu []byte, gnb *context.RanGnbContext) error {
-    ctx, cancel := context.WithCancel(context.Background())
-    defer cancel()
+	contx, cancel := ctx.WithCancel(ctx.Background())
+	defer cancel()
 
-    ch := make(chan Response, 1)
+	ch := make(chan error, 1)
 
-    go func() {
-        time.Sleep(1 * time.Second)
+	go func() {
+		time.Sleep(1 * time.Second)
 
-        select {
-        default:
-            sendMsg, err := getUplinkNASTransport(amfUeNgapID, ranUeNgapID, nasPdu, gnb.GetMccAndMncInOctets(), gnb.GetTacInBytes())
-            if err != nil {
-                return fmt.Errorf("Error getting ueId %d NAS Authentication Response", ranUeNgapID)
-            }
+		select {
+		default:
+			var result error
+			sendMsg, err := getUplinkNASTransport(amfUeNgapID, ranUeNgapID, nasPdu, gnb.GetMccAndMncInOctets(), gnb.GetTacInBytes())
+			if err != nil {
+				result = fmt.Errorf("Error getting ueId %d NAS Authentication Response", ranUeNgapID)
+			} else {
 
-            _, err = connN2.Write(sendMsg)
-            if err != nil {
-                return fmt.Errorf("Error sending ueId %d NAS Authentication Response", ranUeNgapID)
-            }
+				_, err = connN2.Write(sendMsg)
+				if err != nil {
+					result = fmt.Errorf("Error sending ueId %d NAS Authentication Response", ranUeNgapID)
+				} else {
+					log.WithFields(log.Fields{
+						"protocol":    "NGAP",
+						"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
+						"destination": "AMF",
+						"message":     "UPLINK NAS TRANSPORT",
+					}).Info("Sending message")
+				}
 
-            log.WithFields(log.Fields{
-                "protocol":    "NGAP",
-                "source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-                "destination": "AMF",
-                "message":     "UPLINK NAS TRANSPORT",
-            }).Info("Sending message")
+			}
+			ch <- result
+		case <-contx.Done():
+			log.WithFields(log.Fields{
+				"protocol":    "NGAP",
+				"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
+				"destination": "AMF",
+				"message":     "UPLINK NAS TRANSPORT",
+			}).Error("Timeout")
+			return
+		}
+	}()
 
-            ch <- Response{data: nil, status: true}
-        case <-ctx.Done():
-            log.WithFields(log.Fields{
-                "protocol":    "NGAP",
-                "source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-                "destination": "AMF",
-                "message":     "UPLINK NAS TRANSPORT",
-            }).Error("Timeout")
-            return
-        }
-    }()
-
-    select {
-    case <-ch:
-        fmt.Println("Read from ch")
-    case <-time.After(500 * time.Millisecond):
-        fmt.Println("Timed out")
-    }
+	select {
+	case <-ch:
+		return nil
+	case <-time.After(2000 * time.Millisecond):
+		return fmt.Errorf("Timeout on UplinkNASTransport")
+	}
 }

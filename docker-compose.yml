@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+    tester:
+        build: .
+        ports:
+            - 10000:10000
+        security_opt:
+            - seccomp:unconfined
+        volumes:
+            - ./config:/usr/go/local
+        networks:
+            default:
+               ipv4_address: 10.100.200.50
+#        command: dlv debug 'my5G-RANTester/cmd' --listen=:10000 --headless=true --api-version=2 --log  -- nlinear-tests -s 100 -mu 400 -se 1234565432
+#        command: go run cmd/app.go nlinear-tests -s 100 -mu 400 -se 1234565432
+        command: go run cmd/app.go stress-tests -start 10 -end 300 -step 10 -interval 2000
+#        command: go run cmd/app.go load-test -n 400 -g
+        volumes:
+            - ./internal/:/usr/local/go/src/my5G-RANTester/internal
+            - ./cmd/:/usr/local/go/src/my5G-RANTester/cmd
+            - ./config/:/usr/local/go/src/my5G-RANTester/config
+            - ./lib/:/usr/local/go/src/my5G-RANTester/lib
+networks:
+    default:
+        external:
+           name: free5gc-compose_privnet

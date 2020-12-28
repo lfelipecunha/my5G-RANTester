@@ -2,10 +2,11 @@ package templates
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func attachUeWithGNB(imsi string, conf config.Config, ranUeId int64, wg *sync.WaitGroup, ranPort int) {
@@ -37,7 +38,9 @@ func attachUeWithGNB(imsi string, conf config.Config, ranUeId int64, wg *sync.Wa
 		log.Fatal("The test failed when GNB tried to attach! Error:", err)
 	}
 
-	ue, err := control_test_engine.RegistrationUE(conn, imsi, ranUeId, conf, gnbContext, "208", "93")
+	pduSessionID := ranUeId % 255
+
+	ue, err := control_test_engine.RegistrationUE(conn, imsi, pduSessionID, conf, gnbContext, "208", "93")
 	if err != nil {
 		log.Error("The test failed when UE", ue.Suci, "tried to attach! Error:", err)
 	}

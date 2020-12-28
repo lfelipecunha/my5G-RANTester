@@ -94,23 +94,49 @@ func buildUplinkNasTransport(amfUeNgapID, ranUeNgapID int64, nasPdu []byte, plmn
 }
 
 func UplinkNasTransport(connN2 *sctp.SCTPConn, amfUeNgapID int64, ranUeNgapID int64, nasPdu []byte, gnb *context.RanGnbContext) error {
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
 
-	sendMsg, err := getUplinkNASTransport(amfUeNgapID, ranUeNgapID, nasPdu, gnb.GetMccAndMncInOctets(), gnb.GetTacInBytes())
-	if err != nil {
-		return fmt.Errorf("Error getting ueId %d NAS Authentication Response", ranUeNgapID)
-	}
+    ch := make(chan Response, 1)
 
-	_, err = connN2.Write(sendMsg)
-	if err != nil {
-		return fmt.Errorf("Error sending ueId %d NAS Authentication Response", ranUeNgapID)
-	}
+    go func() {
+        time.Sleep(1 * time.Second)
 
-	log.WithFields(log.Fields{
-		"protocol":    "NGAP",
-		"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-		"destination": "AMF",
-		"message":     "UPLINK NAS TRANSPORT",
-	}).Info("Sending message")
+        select {
+        default:
+            sendMsg, err := getUplinkNASTransport(amfUeNgapID, ranUeNgapID, nasPdu, gnb.GetMccAndMncInOctets(), gnb.GetTacInBytes())
+            if err != nil {
+                return fmt.Errorf("Error getting ueId %d NAS Authentication Response", ranUeNgapID)
+            }
 
-	return nil
+            _, err = connN2.Write(sendMsg)
+            if err != nil {
+                return fmt.Errorf("Error sending ueId %d NAS Authentication Response", ranUeNgapID)
+            }
+
+            log.WithFields(log.Fields{
+                "protocol":    "NGAP",
+                "source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
+                "destination": "AMF",
+                "message":     "UPLINK NAS TRANSPORT",
+            }).Info("Sending message")
+
+            ch <- Response{data: nil, status: true}
+        case <-ctx.Done():
+            log.WithFields(log.Fields{
+                "protocol":    "NGAP",
+                "source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
+                "destination": "AMF",
+                "message":     "UPLINK NAS TRANSPORT",
+            }).Error("Timeout")
+            return
+        }
+    }()
+
+    select {
+    case <-ch:
+        fmt.Println("Read from ch")
+    case <-time.After(500 * time.Millisecond):
+        fmt.Println("Timed out")
+    }
 }

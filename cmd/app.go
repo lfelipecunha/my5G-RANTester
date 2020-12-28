@@ -87,6 +87,37 @@ func main() {
 				},
 			},
 			{
+				Name:    "stress-tests",
+				Aliases: []string{"stress-test"},
+				Usage: "\nLoad endurance stress tests.\n" +
+					"Example for increase test: stress-tests -start 10 -step 5 -end 100 -interval 10 \n" +
+					"Example for decrease test: stress-tests -start 100 -step 5 -end 10 -interval 10 \n" +
+					"Example for constant test: stress-tests -start 100 -step 10 -end 100 -interval 10 \n\t\t In this case step is times of loop",
+				Flags: []cli.Flag{
+					&cli.IntFlag{Name: "start", Aliases: []string{"st"}},
+					&cli.IntFlag{Name: "step", Aliases: []string{"sp"}},
+					&cli.IntFlag{Name: "end", Aliases: []string{"e"}},
+					&cli.IntFlag{Name: "interval", Aliases: []string{"i"}},
+				},
+				Action: func(c *cli.Context) error {
+					cfg := config.Data
+
+					if !c.IsSet("start") || !c.IsSet("step") || !c.IsSet("end") || !c.IsSet("interval") {
+						log.Info(c.Command.Usage)
+						return nil
+					}
+
+					log.Info("gNodeB control interface IP/Port: ", cfg.GNodeB.ControlIF.Ip, "/", cfg.GNodeB.ControlIF.Port)
+					log.Info("gNodeB data interface IP/Port: ", cfg.GNodeB.DataIF.Ip, "/", cfg.GNodeB.DataIF.Port)
+					log.Info("AMF IP/Port: ", cfg.AMF.Ip, "/", cfg.AMF.Port)
+					log.Info("UPF IP/Port: ", cfg.UPF.Ip, "/", cfg.UPF.Port)
+					log.Info("---------------------------------------")
+					templates.TestMultiAttachUesLoadStress(c.Int("start"), c.Int("step"), c.Int("end"), c.Int("interval"))
+
+					return nil
+				},
+			},
+			{
 				Name:    "ue",
 				Aliases: []string{"ue"},
 				Usage:   "Testing an ue attached with configuration",

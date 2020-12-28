@@ -2,8 +2,6 @@ package control_test_engine
 
 import (
 	"fmt"
-	"github.com/ishidawataru/sctp"
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine/context"
 	"my5G-RANTester/internal/control_test_engine/nas_control/mm_5gs"
@@ -15,6 +13,9 @@ import (
 	"my5G-RANTester/lib/nas/security"
 	"strings"
 	"time"
+
+	"github.com/ishidawataru/sctp"
+	log "github.com/sirupsen/logrus"
 )
 
 func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf config.Config, gnb *context.RanGnbContext, mcc, mnc string) (*context.RanUeContext, error) {
@@ -88,7 +89,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// send Nas Authentication response within UplinkNasTransport.
 	err = nas_transport.UplinkNasTransport(connN2, ue.AmfUeNgapId, ue.RanUeNgapId, pdu, gnb)
 	if err != nil {
-		log.Fatal("Error sending Uplink Nas transport: ", err)
+		log.Errorf("Error sending Uplink Nas transport: ", err)
+		return ue, err
 	}
 
 	// receive NAS Security Mode Command Msg
@@ -127,7 +129,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 
 	err = nas_transport.UplinkNasTransport(connN2, ue.AmfUeNgapId, ue.RanUeNgapId, pdu, gnb)
 	if err != nil {
-		log.Fatal("Error receiving Uplink Nas transport: ", err)
+		log.Errorf("Error receiving Uplink Nas transport: ", err)
+		return ue, err
 	}
 
 	// receive ngap Initial Context Setup Request Msg.
@@ -178,7 +181,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 
 	err = nas_transport.UplinkNasTransport(connN2, ue.AmfUeNgapId, ue.RanUeNgapId, pdu, gnb)
 	if err != nil {
-		log.Fatal("Error receiving Uplink Nas transport: ", err)
+		log.Errorf("Error receiving Uplink Nas transport: ", err)
+		return ue, err
 	}
 
 	// included configuration update command here.
@@ -216,7 +220,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 
 	err = nas_transport.UplinkNasTransport(connN2, ue.AmfUeNgapId, ue.RanUeNgapId, pdu, gnb)
 	if err != nil {
-		log.Fatal("Error sending Uplink Nas transport: ", err)
+		log.Errorf("Error sending Uplink Nas transport: ", err)
+		return ue, err
 	}
 
 	// receive 12. NGAP-PDU Session Resource Setup Request(DL nas transport((NAS msg-PDU session setup Accept)))
@@ -241,13 +246,13 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// decode IE Nas.
 	nasPdu, err := sm_5gs.DecodeNasPduAccept(ngapMsg)
 	if err != nil {
-		return nil, err
+		return ue, err
 	}
 
 	// decode IE NGAP
 	gtpTeid, err := pdu_session_management.GetGtpTeid(ngapMsg)
 	if err != nil {
-		return nil, err
+		return ue, err
 	}
 
 	// got ip address for ue.

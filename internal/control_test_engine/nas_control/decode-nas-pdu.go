@@ -33,6 +33,9 @@ func GetNasPduFromPduAccept(dlNas *nas.Message) (m *nas.Message) {
 }
 
 func GetNasPduFromDlNas(msg *ngapType.PDUSessionResourceSetupRequest) (m *nas.Message) {
+	if msg == nil || &msg.ProtocolIEs == nil || msg.ProtocolIEs.List == nil {
+		return nil
+	}
 	for _, ie := range msg.ProtocolIEs.List {
 		if ie.Id.Value == ngapType.ProtocolIEIDPDUSessionResourceSetupListSUReq {
 			pDUSessionResourceSetupList := ie.Value.PDUSessionResourceSetupListSUReq

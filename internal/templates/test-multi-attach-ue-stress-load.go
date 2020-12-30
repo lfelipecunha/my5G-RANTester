@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	ish_sctp "github.com/ishidawataru/sctp"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -104,15 +106,25 @@ func testConstant(amount int, step int, interval int, cfg config.Config) {
 func attachUEMultipleGNBs(imsi string, conf config.Config, ranUeId int64, wg *sync.WaitGroup) {
 
 	defer wg.Done()
+	var err error
+	var conn *ish_sctp.SCTPConn
 
-	// make N2(RAN connect to AMF)
-	log.Info("Conecting to AMF...")
-	conn, err := control_test_engine.ConnectToAmf(conf.AMF.Ip, conf.AMF.Port)
+	// Try 3 times to connect to AMF
+	for i := 1; i <= 3; i++ {
+		// make N2(RAN connect to AMF)
+		log.Infof("UE[%s] Attempt %d to Conecting to AMF...", imsi, i)
+		conn, err = control_test_engine.ConnectToAmf(conf.AMF.Ip, conf.AMF.Port)
+		if err == nil {
+			log.Info("OK")
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
 	if err != nil {
 		log.Errorf("The test failed when sctp socket tried to connect to AMF! Error:", err)
 		return
 	}
-	log.Info("OK")
 
 	gnbID := int(ranUeId / 255)
 

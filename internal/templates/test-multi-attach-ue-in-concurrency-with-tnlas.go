@@ -12,13 +12,13 @@ import (
 )
 
 // testing attach and ping for a UE with TNLA.
-func attachUeWithTnla(imsi string, conf config.Config, ranUeId int64, wg *sync.WaitGroup, ranPort int) {
+func attachUeWithTnla(imsi string, conf config.Config, ranUeId int64, wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
 	// make N2(RAN connect to AMF)
 	log.Info("Conecting to AMF...")
-	conn, err := control_test_engine.ConnectToAmf(conf.AMF.Ip, conf.GNodeB.ControlIF.Ip, conf.AMF.Port, ranPort)
+	conn, err := control_test_engine.ConnectToAmf(conf.AMF.Ip, conf.AMF.Port)
 	if err != nil {
 		log.Errorf("The test failed when sctp socket tried to connect to AMF! Error:", err)
 		return
@@ -60,8 +60,6 @@ func TestMultiAttachUesInConcurrencyWithTNLAs(numberUesConcurrency int) {
 	log.Info("Testing attached with ", numberUesConcurrency, " ues using TNLAs")
 	log.Info("[CORE]", cfg.AMF.Name, " Core in Testing")
 
-	ranPort := cfg.GNodeB.ControlIF.Port
-
 	// make n3(RAN connect to UPF)
 	log.Info("Conecting to UPF...")
 	upfConn, err := data_test_engine.ConnectToUpf(cfg.GNodeB.DataIF.Ip, cfg.UPF.Ip, cfg.GNodeB.DataIF.Port, cfg.UPF.Port)
@@ -74,8 +72,7 @@ func TestMultiAttachUesInConcurrencyWithTNLAs(numberUesConcurrency int) {
 	for i := 1; i <= numberUesConcurrency; i++ {
 		imsi := control_test_engine.ImsiGenerator(i)
 		wg.Add(1)
-		go attachUeWithTnla(imsi, cfg, int64(i), &wg, ranPort)
-		ranPort++
+		go attachUeWithTnla(imsi, cfg, int64(i), &wg)
 		// time.Sleep(10 * time.Millisecond)
 	}
 

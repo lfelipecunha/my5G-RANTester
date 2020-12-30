@@ -18,7 +18,7 @@ func TestMultiAttachUesInQueue(numberUes int) {
 
 	log.Info("[CORE]", cfg.AMF.Name, " Core in Testing")
 	log.Info("Conecting to AMF...")
-	conn, err := control_test_engine.ConnectToAmf(cfg.AMF.Ip, cfg.GNodeB.ControlIF.Ip, cfg.AMF.Port, cfg.GNodeB.ControlIF.Port)
+	conn, err := control_test_engine.ConnectToAmf(cfg.AMF.Ip, cfg.AMF.Port)
 	if err != nil {
 		log.Fatal("The test failed when sctp socket tried to connect to AMF! Error: ", err)
 	}

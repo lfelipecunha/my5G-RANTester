@@ -36,7 +36,7 @@ func TestMultiAttachUesLoadStress(start int, step int, end int, interval int) {
 
 func testIncrease(start int, end int, step int, interval int, cfg config.Config) {
 	log.Info("Starting Increase Test")
-	ranPort := cfg.GNodeB.ControlIF.Port
+
 	// Launch several goroutines and increment the WaitGroup counter for each.
 	var wg sync.WaitGroup
 	amount := start
@@ -46,8 +46,7 @@ func testIncrease(start int, end int, step int, interval int, cfg config.Config)
 		for j := 0; j < amount; j++ {
 			imsi := control_test_engine.ImsiGenerator(imsi_control)
 			wg.Add(1)
-			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg, ranPort)
-			ranPort++
+			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg)
 			imsi_control++
 			time.Sleep(10 * time.Millisecond)
 		}
@@ -61,7 +60,6 @@ func testIncrease(start int, end int, step int, interval int, cfg config.Config)
 
 func testDecrease(start int, end int, step int, interval int, cfg config.Config) {
 	log.Info("Starting Decrease Test")
-	ranPort := cfg.GNodeB.ControlIF.Port
 	// Launch several goroutines and increment the WaitGroup counter for each.
 	var wg sync.WaitGroup
 	amount := start
@@ -70,9 +68,8 @@ func testDecrease(start int, end int, step int, interval int, cfg config.Config)
 		for j := 0; j < amount; j++ {
 			imsi := control_test_engine.ImsiGenerator(imsi_control)
 			wg.Add(1)
-			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg, ranPort)
+			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg)
 			imsi_control++
-			ranPort++
 		}
 		amount -= step
 		time.Sleep(time.Duration(interval) * time.Millisecond)
@@ -84,7 +81,6 @@ func testDecrease(start int, end int, step int, interval int, cfg config.Config)
 
 func testConstant(amount int, step int, interval int, cfg config.Config) {
 	log.Info("Starting Constant Test")
-	ranPort := cfg.GNodeB.ControlIF.Port
 	// Launch several goroutines and increment the WaitGroup counter for each.
 	var wg sync.WaitGroup
 	imsi_control := 1
@@ -92,9 +88,8 @@ func testConstant(amount int, step int, interval int, cfg config.Config) {
 		for j := 0; j < amount; j++ {
 			imsi := control_test_engine.ImsiGenerator(imsi_control)
 			wg.Add(1)
-			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg, ranPort)
+			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg)
 			imsi_control++
-			ranPort++
 		}
 		time.Sleep(time.Duration(interval) * time.Millisecond)
 	}

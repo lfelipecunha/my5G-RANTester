@@ -2,10 +2,11 @@ package templates
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func TestMultiAttachGnbInConcurrency(numberGnbs int) {
@@ -20,18 +21,17 @@ func TestMultiAttachGnbInConcurrency(numberGnbs int) {
 
 	log.Info("Testing attached with ", numberGnbs, " gnbs")
 	log.Info("[CORE]", cfg.AMF.Name, " Core in Testing")
-	ranPort := cfg.GNodeB.ControlIF.Port
 
 	// multiple concurrent GNBs authentication using goroutines.
 	for i := 1; i <= numberGnbs; i++ {
 
 		wg.Add(1)
-		go func(wg *sync.WaitGroup, ranPort int, i int) {
+		go func(wg *sync.WaitGroup, i int) {
 
 			defer wg.Done()
 
 			// make N2(RAN connect to AMF)
-			conn, err := control_test_engine.ConnectToAmf(cfg.AMF.Ip, cfg.GNodeB.ControlIF.Ip, cfg.AMF.Port, ranPort)
+			conn, err := control_test_engine.ConnectToAmf(cfg.AMF.Ip, cfg.AMF.Port)
 			if err != nil {
 				log.Fatal("The test failed when sctp socket tried to connect to AMF! Error:", err)
 			}
@@ -60,8 +60,7 @@ func TestMultiAttachGnbInConcurrency(numberGnbs int) {
 
 			// close sctp socket.
 			conn.Close()
-		}(&wg, ranPort, i)
-		ranPort++
+		}(&wg, i)
 	}
 
 	// wait threads.

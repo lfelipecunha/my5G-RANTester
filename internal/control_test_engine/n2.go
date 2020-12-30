@@ -2,12 +2,13 @@ package control_test_engine
 
 import (
 	"fmt"
-	"github.com/ishidawataru/sctp"
 	"my5G-RANTester/lib/ngap/ngapSctp"
 	"net"
+
+	"github.com/ishidawataru/sctp"
 )
 
-func getNgapIp(amfIP, ranIP string, amfPort, ranPort int) (amfAddr, ranAddr *sctp.SCTPAddr, err error) {
+func getNgapIp(amfIP string, amfPort int) (amfAddr *sctp.SCTPAddr, err error) {
 	ips := []net.IPAddr{}
 	// se der um erro != nill entra no if.
 	if ip, err1 := net.ResolveIPAddr("ip", amfIP); err1 != nil {
@@ -20,26 +21,15 @@ func getNgapIp(amfIP, ranIP string, amfPort, ranPort int) (amfAddr, ranAddr *sct
 		IPAddrs: ips,
 		Port:    amfPort,
 	}
-	ips = []net.IPAddr{}
-	if ip, err1 := net.ResolveIPAddr("ip", ranIP); err1 != nil {
-		err = fmt.Errorf("Error resolving address '%s': %v", ranIP, err1)
-		return
-	} else {
-		ips = append(ips, *ip)
-	}
-	ranAddr = &sctp.SCTPAddr{
-		IPAddrs: ips,
-		Port:    ranPort,
-	}
 	return
 }
 
-func ConnectToAmf(amfIP, ranIP string, amfPort, ranPort int) (*sctp.SCTPConn, error) {
-	amfAddr, ranAddr, err := getNgapIp(amfIP, ranIP, amfPort, ranPort)
+func ConnectToAmf(amfIP string, amfPort int) (*sctp.SCTPConn, error) {
+	amfAddr, err := getNgapIp(amfIP, amfPort)
 	if err != nil {
 		return nil, err
 	}
-	conn, err := sctp.DialSCTP("sctp", ranAddr, amfAddr)
+	conn, err := sctp.DialSCTP("sctp", nil, amfAddr)
 	if err != nil {
 		return nil, err
 	}

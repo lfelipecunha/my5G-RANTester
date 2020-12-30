@@ -21,7 +21,7 @@ func TestAttachUeWithConfiguration() {
 	log.Info(fmt.Sprintf("[CORE]%s Core in Testing\n", cfg.AMF.Name))
 
 	// make N2(RAN connect to AMF)
-	conn, err := control_test_engine.ConnectToAmf(cfg.AMF.Ip, cfg.GNodeB.ControlIF.Ip, cfg.AMF.Port, cfg.GNodeB.ControlIF.Port)
+	conn, err := control_test_engine.ConnectToAmf(cfg.AMF.Ip, cfg.AMF.Port)
 	if err != nil {
 		log.Fatal("The test failed when sctp socket tried to connect to AMF! Error:", err)
 	}

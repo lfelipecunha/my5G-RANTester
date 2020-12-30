@@ -10,12 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func attachUeWithGNB(imsi string, conf config.Config, ranUeId int64, wg *sync.WaitGroup, ranPort int) {
+func attachUeWithGNB(imsi string, conf config.Config, ranUeId int64, wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
 	// make N2(RAN connect to AMF)
-	conn, err := control_test_engine.ConnectToAmf(conf.AMF.Ip, conf.GNodeB.ControlIF.Ip, conf.AMF.Port, ranPort)
+	conn, err := control_test_engine.ConnectToAmf(conf.AMF.Ip, conf.AMF.Port)
 	if err != nil {
 		log.Fatal("The test failed when sctp socket tried to connect to AMF! Error:", err)
 	}
@@ -69,14 +69,11 @@ func TestMultiAttachUesInConcurrencyWithGNBs(numberUEs int) {
 	log.Info("Testing attached with ", numberUEs, " ues in different GNBs")
 	log.Info("[CORE]", cfg.AMF.Name, " Core in Testing")
 
-	ranPort := cfg.GNodeB.ControlIF.Port
-
 	// Launch several goroutines and increment the WaitGroup counter for each.
 	for i := 1; i <= numberUEs; i++ {
 		imsi := control_test_engine.ImsiGenerator(i)
 		wg.Add(1)
-		go attachUeWithGNB(imsi, cfg, int64(i), &wg, ranPort)
-		ranPort++
+		go attachUeWithGNB(imsi, cfg, int64(i), &wg)
 		// time.Sleep(10* time.Millisecond)
 	}
 

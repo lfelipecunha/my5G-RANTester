@@ -32,7 +32,7 @@ func (sw *SCTPWrapper) Read(dst []byte) (int, error) {
 	t2 := time.Now()
 	total := t2.UnixNano() - t1.UnixNano()
 
-	log.Infof("Write in: %d ns", total)
+	log.Infof("Read in: %d ns", total)
 
 	return n, err
 }

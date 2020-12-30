@@ -43,7 +43,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
-		"source":      fmt.Sprintf("UE[%d]", ranUeId),
+		"source":      fmt.Sprintf("UE[%d]", imsi),
 		"destination": fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
 		"message":     "REGISTRATION REQUEST",
 	}).Info("Sending message")
@@ -72,7 +72,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
 		"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-		"destination": fmt.Sprintf("UE[%d]", ranUeId),
+		"destination": fmt.Sprintf("UE[%d]", imsi),
 		"message":     "AUTHENTICATION REQUEST",
 	}).Info("Sending message")
 
@@ -85,7 +85,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
-		"source":      fmt.Sprintf("UE[%d]", ranUeId),
+		"source":      fmt.Sprintf("UE[%d]", imsi),
 		"destination": fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
 		"message":     "AUTHENTICATION RESPONSE",
 	}).Info("Sending message")
@@ -118,7 +118,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
 		"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-		"destination": fmt.Sprintf("UE[%d]", ranUeId),
+		"destination": fmt.Sprintf("UE[%d]", imsi),
 		"message":     "SECURITY MODE COMMAND",
 	}).Info("Sending message")
 
@@ -131,7 +131,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
-		"source":      fmt.Sprintf("UE[%d]", ranUeId),
+		"source":      fmt.Sprintf("UE[%d]", imsi),
 		"destination": fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
 		"message":     "SECURITY MODE COMPLETE",
 	}).Info("Sending message")
@@ -159,7 +159,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
 		"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-		"destination": fmt.Sprintf("UE[%d]", ranUeId),
+		"destination": fmt.Sprintf("UE[%d]", imsi),
 		"message":     "REGISTRATION ACCEPT",
 	}).Info("Sending message")
 
@@ -186,7 +186,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
-		"source":      fmt.Sprintf("UE[%d]", ranUeId),
+		"source":      fmt.Sprintf("UE[%d]", imsi),
 		"destination": fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
 		"message":     "REGISTRATION COMPLETE",
 	}).Info("Sending message")
@@ -214,7 +214,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 		log.WithFields(log.Fields{
 			"protocol":    "NAS",
 			"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-			"destination": fmt.Sprintf("UE[%d]", ranUeId),
+			"destination": fmt.Sprintf("UE[%d]", imsi),
 			"message":     "CONFIGURATION UPDATE COMMAND",
 		}).Info("Sending message")
 	}
@@ -227,7 +227,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 	}
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
-		"source":      fmt.Sprintf("UE[%d]", ranUeId),
+		"source":      fmt.Sprintf("UE[%d]", imsi),
 		"destination": fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
 		"message":     "UL NAS TRANSPORT/PDU SESSSION ESTABLISHMENT REQUEST",
 	}).Info("Sending message")
@@ -254,7 +254,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
 		"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-		"destination": fmt.Sprintf("UE[%d]", ranUeId),
+		"destination": fmt.Sprintf("UE[%d]", imsi),
 		"message":     "DL NAS TRANSPORT/PDU SESSION ESTABLISHMENT ACCEPT",
 	}).Info("Sending message")
 
@@ -293,7 +293,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 	// time.Sleep(1 * time.Second)
 	time.Sleep(100 * time.Millisecond)
 
-	msg := fmt.Sprintf("[UE%d][%s] RECEIVE IP:%s AND UP-TEID:0x0000000%x DL-TEID:x0000000%x", ranUeId, imsi, ue.GetIp(), ue.GetUeTeid(), ue.AmfUeNgapId)
+	msg := fmt.Sprintf("[UE%d][%s] RECEIVE IP:%s AND UP-TEID:0x0000000%x DL-TEID:x0000000%x", imsi, imsi, ue.GetIp(), ue.GetUeTeid(), ue.AmfUeNgapId)
 	log.Info(msg)
 	log.Info("REGISTRATION FINISHED")
 

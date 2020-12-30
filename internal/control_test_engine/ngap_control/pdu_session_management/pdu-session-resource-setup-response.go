@@ -14,11 +14,11 @@ import (
 func PDUSessionResourceSetupResponse(connN2 *sctp.SCTPWrapper, amfUeNgapID int64, ranUeNgapID int64, supi string, ranIpAddr string) error {
 	sendMsg, err := getPDUSessionResourceSetupResponse(amfUeNgapID, ranUeNgapID, ranIpAddr)
 	if err != nil {
-		return fmt.Errorf("Error getting %s ue NGAP-PDU Session Resource Setup Response", supi)
+		return fmt.Errorf("Error getting %s ue NGAP-PDU Session Resource Setup Response: %s", supi, err)
 	}
 	_, err = connN2.Write(sendMsg)
 	if err != nil {
-		return fmt.Errorf("Error sending %s ue NGAP-PDU Session Resource Setup Response", supi)
+		return fmt.Errorf("Error sending %s ue NGAP-PDU Session Resource Setup Response: %s", supi, err)
 	}
 
 	return nil

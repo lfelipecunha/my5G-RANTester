@@ -37,7 +37,7 @@ func attachUeWithTnla(imsi string, conf config.Config, ranUeId int64, wg *sync.W
 
 	ue, err := control_test_engine.RegistrationUE(&wrapper, imsi, ranUeId, conf, gnbContext, "208", "93")
 	if err != nil {
-		log.Error("The test failed when UE", ue.Suci, "tried to attach! Error:", err)
+		log.Error("The test failed when UE", ranUeId, " Suci: ", ue.Suci, "tried to attach! Error:", err)
 	}
 
 	// end sctp socket.

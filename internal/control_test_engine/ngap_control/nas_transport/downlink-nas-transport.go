@@ -17,12 +17,12 @@ func DownlinkNasTransport(connN2 *sctp.SCTPWrapper, supi string) (*ngapType.NGAP
 
 	n, err := connN2.Read(recvMsg)
 	if err != nil {
-		return nil, fmt.Errorf("Error receiving %s ue NGAP message in downlinkNasTransport", supi)
+		return nil, fmt.Errorf("Error receiving %s ue NGAP message in downlinkNasTransport: %s", supi, err)
 	}
 
 	ngapMsg, err := ngap.Decoder(recvMsg[:n])
 	if err != nil {
-		return nil, fmt.Errorf("Error decoding %s ue NGAP message in downlinkNasTransport", supi)
+		return nil, fmt.Errorf("Error decoding %s ue NGAP message in downlinkNasTransport: %s", supi, err)
 	}
 
 	return ngapMsg, nil

@@ -2,12 +2,12 @@ package ue_context_management
 
 import (
 	"fmt"
-	"github.com/ishidawataru/sctp"
+	"my5G-RANTester/internal/sctp"
 	"my5G-RANTester/lib/ngap"
 	"my5G-RANTester/lib/ngap/ngapType"
 )
 
-func InitialContextSetupResponse(connN2 *sctp.SCTPConn, amfUeNgapID int64, ranUeNgapID int64, supi string) error {
+func InitialContextSetupResponse(connN2 *sctp.SCTPWrapper, amfUeNgapID int64, ranUeNgapID int64, supi string) error {
 
 	sendMsg, err := getInitialContextSetupResponse(amfUeNgapID, ranUeNgapID)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine"
+	"my5G-RANTester/internal/sctp"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
@@ -40,7 +41,9 @@ func attachUeWithGNB(imsi string, conf config.Config, ranUeId int64, wg *sync.Wa
 
 	pduSessionID := ranUeId % 255
 
-	ue, err := control_test_engine.RegistrationUE(conn, imsi, pduSessionID, conf, gnbContext, "208", "93")
+	wrapper := sctp.SCTPWrapper{Conn: conn}
+
+	ue, err := control_test_engine.RegistrationUE(&wrapper, imsi, pduSessionID, conf, gnbContext, "208", "93")
 	if err != nil {
 		log.Error("The test failed when UE", ue.Suci, "tried to attach! Error:", err)
 	}

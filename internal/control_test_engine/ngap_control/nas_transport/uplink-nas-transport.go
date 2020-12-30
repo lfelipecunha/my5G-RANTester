@@ -7,7 +7,8 @@ import (
 	"my5G-RANTester/lib/ngap"
 	"my5G-RANTester/lib/ngap/ngapType"
 
-	"github.com/ishidawataru/sctp"
+	"my5G-RANTester/internal/sctp"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -94,25 +95,25 @@ func buildUplinkNasTransport(amfUeNgapID, ranUeNgapID int64, nasPdu []byte, plmn
 	return
 }
 
-func UplinkNasTransport(connN2 *sctp.SCTPConn, amfUeNgapID int64, ranUeNgapID int64, nasPdu []byte, gnb *context.RanGnbContext) error {
-    var result error
-    sendMsg, err := getUplinkNASTransport(amfUeNgapID, ranUeNgapID, nasPdu, gnb.GetMccAndMncInOctets(), gnb.GetTacInBytes())
-    if err != nil {
-        result = fmt.Errorf("Error getting ueId %d NAS Authentication Response", ranUeNgapID)
-    } else {
+func UplinkNasTransport(connN2 *sctp.SCTPWrapper, amfUeNgapID int64, ranUeNgapID int64, nasPdu []byte, gnb *context.RanGnbContext) error {
+	var result error
+	sendMsg, err := getUplinkNASTransport(amfUeNgapID, ranUeNgapID, nasPdu, gnb.GetMccAndMncInOctets(), gnb.GetTacInBytes())
+	if err != nil {
+		result = fmt.Errorf("Error getting ueId %d NAS Authentication Response", ranUeNgapID)
+	} else {
 
-        _, err = connN2.Write(sendMsg)
-        if err != nil {
-            result = fmt.Errorf("Error sending ueId %d NAS Authentication Response", ranUeNgapID)
-        } else {
-            log.WithFields(log.Fields{
-                "protocol":    "NGAP",
-                "source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
-                "destination": "AMF",
-                "message":     "UPLINK NAS TRANSPORT",
-            }).Info("Sending message")
-        }
+		_, err = connN2.Write(sendMsg)
+		if err != nil {
+			result = fmt.Errorf("Error sending ueId %d NAS Authentication Response", ranUeNgapID)
+		} else {
+			log.WithFields(log.Fields{
+				"protocol":    "NGAP",
+				"source":      fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
+				"destination": "AMF",
+				"message":     "UPLINK NAS TRANSPORT",
+			}).Info("Sending message")
+		}
 
-    }
-    return result
+	}
+	return result
 }

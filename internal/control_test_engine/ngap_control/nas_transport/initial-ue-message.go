@@ -3,12 +3,13 @@ package nas_transport
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/ishidawataru/sctp"
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/internal/control_test_engine/context"
+	"my5G-RANTester/internal/sctp"
 	"my5G-RANTester/lib/aper"
 	"my5G-RANTester/lib/ngap"
 	"my5G-RANTester/lib/ngap/ngapType"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var TestPlmn ngapType.PLMNIdentity
@@ -138,7 +139,7 @@ func BuildInitialUEMessage(ranUeNgapID int64, nasPdu []byte, fiveGSTmsi string, 
 	return
 }
 
-func InitialUEMessage(connN2 *sctp.SCTPConn, registrationRequest []byte, ue *context.RanUeContext, gnb *context.RanGnbContext) error {
+func InitialUEMessage(connN2 *sctp.SCTPWrapper, registrationRequest []byte, ue *context.RanUeContext, gnb *context.RanGnbContext) error {
 
 	// new UE Context
 	// ue.NewRanUeContext(imsi, ranUeId, security.AlgCiphering128NEA0, security.AlgIntegrity128NIA2, key, opc, "c9e8763286b5b9ffbdf56e1297d0887b", amf)

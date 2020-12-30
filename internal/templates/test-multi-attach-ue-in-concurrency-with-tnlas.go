@@ -1,12 +1,14 @@
 package templates
 
 import (
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/config"
 	control_test_engine "my5G-RANTester/internal/control_test_engine"
 	"my5G-RANTester/internal/data_test_engine"
+	"my5G-RANTester/internal/sctp"
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // testing attach and ping for a UE with TNLA.
@@ -19,7 +21,7 @@ func attachUeWithTnla(imsi string, conf config.Config, ranUeId int64, wg *sync.W
 	conn, err := control_test_engine.ConnectToAmf(conf.AMF.Ip, conf.GNodeB.ControlIF.Ip, conf.AMF.Port, ranPort)
 	if err != nil {
 		log.Errorf("The test failed when sctp socket tried to connect to AMF! Error:", err)
-        return
+		return
 	}
 	log.Info("OK")
 
@@ -27,11 +29,13 @@ func attachUeWithTnla(imsi string, conf config.Config, ranUeId int64, wg *sync.W
 	gnbContext, err := control_test_engine.RegistrationGNB(conn, conf.GNodeB.PlmnList.GnbId, "my5GRANTester", conf)
 	if err != nil {
 		log.Errorf("The test failed when GNB tried to attach! Error:", err)
-        conn.Close()
-        return
+		conn.Close()
+		return
 	}
 
-	ue, err := control_test_engine.RegistrationUE(conn, imsi, ranUeId, conf, gnbContext, "208", "93")
+	wrapper := sctp.SCTPWrapper{Conn: conn}
+
+	ue, err := control_test_engine.RegistrationUE(&wrapper, imsi, ranUeId, conf, gnbContext, "208", "93")
 	if err != nil {
 		log.Error("The test failed when UE", ue.Suci, "tried to attach! Error:", err)
 	}

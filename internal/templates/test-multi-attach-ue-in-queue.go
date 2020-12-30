@@ -1,10 +1,12 @@
 package templates
 
 import (
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/config"
 	control_test_engine "my5G-RANTester/internal/control_test_engine"
 	"my5G-RANTester/internal/data_test_engine"
+	"my5G-RANTester/internal/sctp"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // testing attach and ping for multiple queued UEs.
@@ -45,7 +47,9 @@ func TestMultiAttachUesInQueue(numberUes int) {
 		// generating some IMSIs to each UE.
 		imsi := control_test_engine.ImsiGenerator(i)
 
-		ue, err := control_test_engine.RegistrationUE(conn, imsi, int64(i), cfg, contextGnb, mcc, mnc)
+		wrapper := sctp.SCTPWrapper{Conn: conn}
+
+		ue, err := control_test_engine.RegistrationUE(&wrapper, imsi, int64(i), cfg, contextGnb, mcc, mnc)
 		if err != nil {
 			log.Error("The test failed when UE ", imsi, " tried to attach! Error: ", err)
 		}

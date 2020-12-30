@@ -2,10 +2,12 @@ package templates
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine"
 	"my5G-RANTester/internal/data_test_engine"
+	"my5G-RANTester/internal/sctp"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func TestAttachUeWithConfiguration() {
@@ -36,8 +38,9 @@ func TestAttachUeWithConfiguration() {
 		log.Fatal("The test failed when GNB tried to attach! Error:", err)
 	}
 
+	wrapper := sctp.SCTPWrapper{Conn: conn}
 	// authentication to a UE.
-	ue, err := control_test_engine.RegistrationUE(conn, cfg.Ue.Imsi, int64(1), cfg, contextGnb, cfg.Ue.Hplmn.Mcc, cfg.Ue.Hplmn.Mnc)
+	ue, err := control_test_engine.RegistrationUE(&wrapper, cfg.Ue.Imsi, int64(1), cfg, contextGnb, cfg.Ue.Hplmn.Mcc, cfg.Ue.Hplmn.Mnc)
 	if err != nil {
 		log.Error("The test failed when UE", ue.Suci, "tried to attach! Error:", err)
 	}

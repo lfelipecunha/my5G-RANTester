@@ -8,10 +8,10 @@ import (
 	"my5G-RANTester/lib/ngap/ngapConvert"
 	"my5G-RANTester/lib/ngap/ngapType"
 
-	"github.com/ishidawataru/sctp"
+	"my5G-RANTester/internal/sctp"
 )
 
-func PDUSessionResourceSetupResponse(connN2 *sctp.SCTPConn, amfUeNgapID int64, ranUeNgapID int64, supi string, ranIpAddr string) error {
+func PDUSessionResourceSetupResponse(connN2 *sctp.SCTPWrapper, amfUeNgapID int64, ranUeNgapID int64, supi string, ranIpAddr string) error {
 	sendMsg, err := getPDUSessionResourceSetupResponse(amfUeNgapID, ranUeNgapID, ranIpAddr)
 	if err != nil {
 		return fmt.Errorf("Error getting %s ue NGAP-PDU Session Resource Setup Response", supi)

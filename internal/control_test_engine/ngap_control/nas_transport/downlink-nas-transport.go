@@ -2,14 +2,15 @@ package nas_transport
 
 import (
 	"fmt"
-	"github.com/ishidawataru/sctp"
-	log "github.com/sirupsen/logrus"
+	"my5G-RANTester/internal/sctp"
 	"my5G-RANTester/lib/ngap"
 	"my5G-RANTester/lib/ngap/ngapType"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
-func DownlinkNasTransport(connN2 *sctp.SCTPConn, supi string) (*ngapType.NGAPPDU, error) {
+func DownlinkNasTransport(connN2 *sctp.SCTPWrapper, supi string) (*ngapType.NGAPPDU, error) {
 
 	var recvMsg = make([]byte, 2048)
 	var n int
@@ -27,7 +28,7 @@ func DownlinkNasTransport(connN2 *sctp.SCTPConn, supi string) (*ngapType.NGAPPDU
 	return ngapMsg, nil
 }
 
-func DownlinkNasTransportForConfigurationUpdateCommand(connN2 *sctp.SCTPConn, supi string) *ngapType.NGAPPDU {
+func DownlinkNasTransportForConfigurationUpdateCommand(connN2 *sctp.SCTPWrapper, supi string) *ngapType.NGAPPDU {
 
 	// make channels
 	c1 := make(chan bool)

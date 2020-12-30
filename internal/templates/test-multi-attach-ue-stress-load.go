@@ -43,12 +43,12 @@ func testIncrease(start int, end int, step int, interval int, cfg config.Config)
 	imsi_control := 1
 	for amount <= end {
 		log.Info("Launching ", amount, " UEs")
-		for j := 0; j <= amount; j++ {
+		for j := 0; j < amount; j++ {
 			imsi := control_test_engine.ImsiGenerator(imsi_control)
-			imsi_control++
 			wg.Add(1)
 			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg, ranPort)
 			ranPort++
+			imsi_control++
 			time.Sleep(10 * time.Millisecond)
 		}
 		amount += step
@@ -67,11 +67,11 @@ func testDecrease(start int, end int, step int, interval int, cfg config.Config)
 	amount := start
 	imsi_control := 1
 	for amount >= end {
-		for j := 0; j <= amount; j++ {
+		for j := 0; j < amount; j++ {
 			imsi := control_test_engine.ImsiGenerator(imsi_control)
-			imsi_control++
 			wg.Add(1)
 			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg, ranPort)
+			imsi_control++
 			ranPort++
 		}
 		amount -= step
@@ -89,11 +89,11 @@ func testConstant(amount int, step int, interval int, cfg config.Config) {
 	var wg sync.WaitGroup
 	imsi_control := 1
 	for i := 0; i <= step; i++ {
-		for j := 0; j <= amount; j++ {
+		for j := 0; j < amount; j++ {
 			imsi := control_test_engine.ImsiGenerator(imsi_control)
-			imsi_control++
 			wg.Add(1)
 			go attachUeWithTnla(imsi, cfg, int64(imsi_control), &wg, ranPort)
+			imsi_control++
 			ranPort++
 		}
 		time.Sleep(time.Duration(interval) * time.Millisecond)

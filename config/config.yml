@@ -26,7 +26,8 @@ ue:
     sst: "010203"
   ping: "60.60.0.101"
 amfif:
-  ip: "10.100.200.250"
+  ip: "10.0.5.1"
+#  ip: "amf.free5gc.org"
   port: 38412
   name: "free5gc"
 upfif:

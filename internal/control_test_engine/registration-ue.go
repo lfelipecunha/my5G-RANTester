@@ -19,7 +19,10 @@ import (
 )
 
 func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf config.Config, gnb *context.RanGnbContext, mcc, mnc string) (*context.RanUeContext, error) {
-
+    formatter := new(log.TextFormatter)
+	formatter.TimestampFormat = "2006-01-02T15:04:05.999999999Z07:00"
+	formatter.FullTimestamp = true
+	log.SetFormatter(formatter)
 	// instance new ue.
 	ue := &context.RanUeContext{}
 
@@ -47,13 +50,15 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// make initial ue message.
 	err := nas_transport.InitialUEMessage(connN2, registrationRequest, ue, gnb)
 	if err != nil {
-		log.Fatal("Error sending initial ue message: ", err)
+		log.Errorf("Error sending initial ue message: ", err)
+        return ue, err
 	}
 
 	// receive NAS Authentication Request Msg
 	ngapMsg, err := nas_transport.DownlinkNasTransport(connN2, ue.Supi)
 	if err != nil {
-		log.Fatal("Error sending Downlink Nas transport: ", err)
+		log.Errorf("Error sending Downlink Nas transport: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{
@@ -73,7 +78,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// send NAS Authentication Response
 	pdu, err := mm_5gs.AuthenticationResponse(ue, ngapMsg)
 	if err != nil {
-		log.Fatal("Error sending Authentication Response: ", err)
+		log.Errorf("Error sending Authentication Response: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{
@@ -96,7 +102,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// receive NAS Security Mode Command Msg
 	_, err = nas_transport.DownlinkNasTransport(connN2, ue.Supi)
 	if err != nil {
-		log.Fatal("Error receive Downlink Nas transport: ", err)
+		log.Errorf("Error receive Downlink Nas transport: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{
@@ -117,7 +124,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// send NAS Security Mode Complete from UplinkNasTransport
 	pdu, err = mm_5gs.SecurityModeComplete(ue)
 	if err != nil {
-		log.Fatal("Error sending Security Mode Complete: ", err)
+		log.Errorf("Error sending Security Mode Complete: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{
@@ -136,7 +144,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// receive ngap Initial Context Setup Request Msg.
 	_, err = nas_transport.DownlinkNasTransport(connN2, ue.Supi)
 	if err != nil {
-		log.Fatal("Error receive Initial Context Setup Request: ", err)
+		log.Errorf("Error receive Initial Context Setup Request: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{
@@ -156,7 +165,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// send ngap Initial Context Setup Response Msg
 	err = ue_context_management.InitialContextSetupResponse(connN2, ue.AmfUeNgapId, ue.RanUeNgapId, ue.Supi)
 	if err != nil {
-		log.Fatal("Error sending Initial Context Setup Response: ", err)
+		log.Errorf("Error sending Initial Context Setup Response: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{
@@ -169,7 +179,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// send NAS Registration Complete Msg
 	pdu, err = mm_5gs.RegistrationComplete(ue)
 	if err != nil {
-		log.Fatal("Error sending Registration Complete: ", err)
+		log.Errorf("Error sending Registration Complete: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{
@@ -189,7 +200,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	if strings.ToLower(conf.AMF.Name) == "open5gs" {
 		_, err = nas_transport.DownlinkNasTransport(connN2, ue.Supi)
 		if err != nil {
-			log.Fatal("Error receiving Downlink Nas transport: ", err)
+			log.Errorf("Error receiving Downlink Nas transport: ", err)
+            return ue, err
 		}
 		log.WithFields(log.Fields{
 			"protocol":    "NGAP",
@@ -209,7 +221,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// send PduSessionEstablishmentRequest Msg
 	pdu, err = mm_5gs.UlNasTransport(ue, uint8(ue.AmfUeNgapId), nasMessage.ULNASTransportRequestTypeInitialRequest, "internet", &ue.Snssai)
 	if err != nil {
-		log.Fatal("Error sending PDU Session request: ", err)
+		log.Errorf("Error sending PDU Session request: ", err)
+        return ue, err
 	}
 	log.WithFields(log.Fields{
 		"protocol":    "NAS",
@@ -227,7 +240,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// receive 12. NGAP-PDU Session Resource Setup Request(DL nas transport((NAS msg-PDU session setup Accept)))
 	ngapMsg, err = nas_transport.DownlinkNasTransport(connN2, ue.Supi)
 	if err != nil {
-		log.Fatal("Error receiving Downlink Nas transport: ", err)
+		log.Errorf("Error receiving Downlink Nas transport: ", err)
+        return ue, err
 	}
 	log.WithFields(log.Fields{
 		"protocol":    "NGAP",
@@ -264,7 +278,8 @@ func RegistrationUE(connN2 *sctp.SCTPConn, imsi string, ranUeId int64, conf conf
 	// send 14. NGAP-PDU Session Resource Setup Response.
 	err = pdu_session_management.PDUSessionResourceSetupResponse(connN2, ue.AmfUeNgapId, ue.RanUeNgapId, ue.Supi, conf.GNodeB.DataIF.Ip)
 	if err != nil {
-		log.Fatal("Error sending PDUSessionResourceSetupResponse: ", err)
+		log.Errorf("Error sending PDUSessionResourceSetupResponse: ", err)
+        return ue, err
 	}
 
 	log.WithFields(log.Fields{

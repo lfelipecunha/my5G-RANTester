@@ -10,9 +10,9 @@ import (
 func DecodeNasPduAccept(ngapMsg *ngapType.NGAPPDU) (*nas.Message, error) {
 
 	// get NasPdu from DlNas.
-	nasPdu := nas_control.GetNasPduFromDlNas(ngapMsg.InitiatingMessage.Value.PDUSessionResourceSetupRequest)
-	if nasPdu == nil {
-		return nil, fmt.Errorf("Error in get NasPdu from DL NAS message")
+	nasPdu, err := nas_control.GetNasPduFromDlNas(ngapMsg.InitiatingMessage.Value.PDUSessionResourceSetupRequest)
+	if err != nil {
+		return nil, fmt.Errorf("Error in get NasPdu from DL NAS message: %s", err)
 	}
 
 	// get NasPdu from Pdu Session establishment accept.

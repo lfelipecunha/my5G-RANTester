@@ -1,6 +1,7 @@
 package nas_control
 
 import (
+	"fmt"
 	"my5G-RANTester/lib/nas"
 	"my5G-RANTester/lib/ngap/ngapType"
 )
@@ -32,9 +33,9 @@ func GetNasPduFromPduAccept(dlNas *nas.Message) (m *nas.Message) {
 	return
 }
 
-func GetNasPduFromDlNas(msg *ngapType.PDUSessionResourceSetupRequest) (m *nas.Message) {
+func GetNasPduFromDlNas(msg *ngapType.PDUSessionResourceSetupRequest) (m *nas.Message, e error) {
 	if msg == nil || &msg.ProtocolIEs == nil || msg.ProtocolIEs.List == nil {
-		return nil
+		return nil, fmt.Errorf("Message is empty")
 	}
 	for _, ie := range msg.ProtocolIEs.List {
 		if ie.Id.Value == ngapType.ProtocolIEIDPDUSessionResourceSetupListSUReq {
@@ -47,11 +48,11 @@ func GetNasPduFromDlNas(msg *ngapType.PDUSessionResourceSetupRequest) (m *nas.Me
 				m := new(nas.Message)
 				err := m.PlainNasDecode(&payload)
 				if err != nil {
-					return nil
+					return nil, err
 				}
-				return m
+				return m, nil
 			}
 		}
 	}
-	return nil
+	return nil, fmt.Errorf("Message incorrect")
 }

@@ -52,7 +52,7 @@ func testIncrease(start int, end int, step int, interval int, cfg config.Config)
 			wg.Add(1)
 			go attachUEMultipleGNBs(imsi, cfg, int64(imsiControl), &wg)
 			imsiControl++
-			time.Sleep(10 * time.Millisecond)
+//			time.Sleep(10 * time.Millisecond)
 		}
 		amount += step
 		time.Sleep(time.Duration(interval) * time.Millisecond)
@@ -118,7 +118,7 @@ func attachUEMultipleGNBs(imsi string, conf config.Config, ranUeId int64, wg *sy
 			log.Info("OK")
 			break
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 	}
 
 	if err != nil {
@@ -128,7 +128,7 @@ func attachUEMultipleGNBs(imsi string, conf config.Config, ranUeId int64, wg *sy
 
 	gnbID := int(ranUeId / 255)
 
-	ranUeId = ranUeId % 255
+//	ranUeId = ranUeId % 255
 
 	// multiple names for GNBs.
 	gnbName := fmt.Sprint("my5gRanTester", gnbID)

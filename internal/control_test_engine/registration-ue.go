@@ -5,14 +5,14 @@ import (
 	"my5G-RANTester/config"
 	"my5G-RANTester/internal/control_test_engine/context"
 	"my5G-RANTester/internal/control_test_engine/nas_control/mm_5gs"
-	"my5G-RANTester/internal/control_test_engine/nas_control/sm_5gs"
+//	"my5G-RANTester/internal/control_test_engine/nas_control/sm_5gs"
 	"my5G-RANTester/internal/control_test_engine/ngap_control/nas_transport"
-	"my5G-RANTester/internal/control_test_engine/ngap_control/pdu_session_management"
+//	"my5G-RANTester/internal/control_test_engine/ngap_control/pdu_session_management"
 	"my5G-RANTester/internal/control_test_engine/ngap_control/ue_context_management"
 	"my5G-RANTester/lib/nas/nasMessage"
 	"my5G-RANTester/lib/nas/security"
-	"strings"
-	"time"
+//	"strings"
+//	"time"
 
 	"my5G-RANTester/internal/sctp"
 
@@ -190,7 +190,7 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 		"destination": fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
 		"message":     "REGISTRATION COMPLETE",
 	}).Info("Sending message")
-
+/*
 	err = nas_transport.UplinkNasTransport(connN2, ue.AmfUeNgapId, ue.RanUeNgapId, pdu, gnb)
 	if err != nil {
 		log.Errorf("Error receiving Uplink Nas transport: ", err)
@@ -294,8 +294,12 @@ func RegistrationUE(connN2 *sctp.SCTPWrapper, imsi string, ranUeId int64, conf c
 	time.Sleep(100 * time.Millisecond)
 
 	msg := fmt.Sprintf("UE[%s] RECEIVE IP:%s AND UP-TEID:0x0000000%x DL-TEID:x0000000%x", imsi, ue.GetIp(), ue.GetUeTeid(), ue.AmfUeNgapId)
-	log.Info(msg)
-	log.Info("REGISTRATION FINISHED")
+	log.Info(msg)*/
+	log.WithFields(log.Fields{
+		"source":      fmt.Sprintf("UE[%s]", imsi),
+		"destination": fmt.Sprintf("GNB[ID:%s]", gnb.GetGnbId()),
+		"message":     "REGISTRATION COMPLETE",
+	}).Info("REGISTRATION FINISHED")
 
 	// function worked fine.
 	return ue, nil
